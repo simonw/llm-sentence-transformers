@@ -9,9 +9,7 @@ import json
 def register_embedding_models(register):
     sentence_transformers_path = llm.user_dir() / "sentence-transformers.json"
     if not sentence_transformers_path.exists():
-        sentence_transformers_path.write_text(
-            json.dumps(["all-MiniLM-L6-v2"]), "utf-8"
-        )
+        sentence_transformers_path.write_text(json.dumps(["all-MiniLM-L6-v2"]), "utf-8")
     models = json.loads(sentence_transformers_path.read_text("utf-8"))
     for model in models:
         register(
