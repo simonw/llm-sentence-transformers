@@ -1,0 +1,26 @@
+[project]
+name = "llm-embed-sentence-transformers"
+version = "0.1"
+description = " Use sentence-transformers for embeddings with LLM"
+readme = "README.md"
+authors = [{name = "Simon Willison"}]
+license = {text = "Apache-2.0"}
+classifiers = [
+    "License :: OSI Approved :: Apache Software License"
+]
+dependencies = [
+    "llm",
+    "sentence-transformers"
+]
+
+[project.urls]
+Homepage = "https://github.com/simonw/llm-embed-sentence-transformers"
+Changelog = "https://github.com/simonw/llm-embed-sentence-transformers/releases"
+Issues = "https://github.com/simonw/llm-embed-sentence-transformers/issues"
+CI = "https://github.com/simonw/llm-embed-sentence-transformers/actions"
+
+[project.entry-points.llm]
+embed_sentence_transformers = "llm_embed_sentence_transformers"
+
+[project.optional-dependencies]
+test = ["pytest"]
