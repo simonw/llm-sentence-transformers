@@ -1,5 +1,5 @@
 [project]
-name = "llm-embed-sentence-transformers"
+name = "llm-sentence-transformers"
 version = "0.1"
 description = " Use sentence-transformers for embeddings with LLM"
 readme = "README.md"
@@ -14,13 +14,13 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/simonw/llm-embed-sentence-transformers"
-Changelog = "https://github.com/simonw/llm-embed-sentence-transformers/releases"
-Issues = "https://github.com/simonw/llm-embed-sentence-transformers/issues"
-CI = "https://github.com/simonw/llm-embed-sentence-transformers/actions"
+Homepage = "https://github.com/simonw/llm-sentence-transformers"
+Changelog = "https://github.com/simonw/llm-sentence-transformers/releases"
+Issues = "https://github.com/simonw/llm-sentence-transformers/issues"
+CI = "https://github.com/simonw/llm-sentence-transformers/actions"
 
 [project.entry-points.llm]
-embed_sentence_transformers = "llm_embed_sentence_transformers"
+sentence_transformers = "llm_sentence_transformers"
 
 [project.optional-dependencies]
 test = ["pytest"]
