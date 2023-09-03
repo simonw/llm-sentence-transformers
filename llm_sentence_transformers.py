@@ -67,5 +67,5 @@ class SentenceTransformerModel(llm.EmbeddingModel):
     def embed_batch(self, texts):
         if self._model is None:
             self._model = SentenceTransformer(self.model_name)
-        results = self._model.encode(texts)
+        results = self._model.encode(list(texts))
         return [list(map(float, result)) for result in results]

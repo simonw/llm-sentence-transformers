@@ -2,6 +2,7 @@ from click.testing import CliRunner
 from llm.cli import cli
 import llm
 import json
+import sqlite_utils
 
 
 def test_model_installed():
@@ -28,3 +29,18 @@ def test_cli_register(user_path):
     )
     assert result.exit_code == 0, result.output
     assert "all-MiniLM-L12-v2" in json.loads((path).read_text("utf-8"))
+
+
+def test_embed_multi_with_generator():
+    db = sqlite_utils.Database(memory=True)
+    collection = llm.Collection(
+        name="test", db=db, model_id="sentence-transformers/all-MiniLM-L6-v2"
+    )
+
+    def generate():
+        yield (1, "hello world")
+        yield (2, "goodbye world")
+
+    assert collection.count() == 0
+    collection.embed_multi(generate())
+    assert collection.count() == 2
