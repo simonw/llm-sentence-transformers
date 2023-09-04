@@ -23,12 +23,33 @@ def test_run_embedding():
 def test_cli_register(user_path):
     path = user_path / "sentence-transformers.json"
     assert not path.exists()
+    assert not (user_path / "aliases.json").exists()
     runner = CliRunner()
     result = runner.invoke(
-        cli, ["sentence-transformers", "register", "all-MiniLM-L12-v2", "--lazy"]
+        cli,
+        [
+            "sentence-transformers",
+            "register",
+            "all-MiniLM-L12-v2",
+            "--lazy",
+            "--alias",
+            "a1",
+            "--alias",
+            "a2",
+        ],
     )
     assert result.exit_code == 0, result.output
     assert "all-MiniLM-L12-v2" in json.loads((path).read_text("utf-8"))
+    # And aliases should be set
+    assert json.loads((user_path / "aliases.json").read_text("utf-8")) == {
+        "a1": "sentence-transformers/all-MiniLM-L12-v2",
+        "a2": "sentence-transformers/all-MiniLM-L12-v2",
+    }
+    for alias in ("a1", "a2"):
+        assert (
+            llm.get_embedding_model(alias).model_id
+            == "sentence-transformers/all-MiniLM-L12-v2"
+        )
 
 
 def test_embed_multi_with_generator():

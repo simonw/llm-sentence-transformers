@@ -49,13 +49,19 @@ def register_commands(cli):
         if not sentence_transformers_path.exists():
             sentence_transformers_path.write_text("[]", "utf-8")
         current = json.loads(sentence_transformers_path.read_text("utf-8"))
+        full_name = f"sentence-transformers/{name}"
         if name in current:
+            # Set the aliases anyway
+            for alias in aliases:
+                llm.set_alias(alias, full_name)
             raise click.ClickException(f"Model {name} is already registered")
         current.append(name)
         sentence_transformers_path.write_text(json.dumps(current), "utf-8")
         if not lazy:
-            model = SentenceTransformer(name, name)
+            model = SentenceTransformer(full_name, name)
             model.encode(["hello world"])
+        for alias in aliases:
+            llm.set_alias(alias, full_name)
 
 
 class SentenceTransformerModel(llm.EmbeddingModel):
