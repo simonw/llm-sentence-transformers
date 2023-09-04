@@ -58,8 +58,8 @@ def register_commands(cli):
         current.append(name)
         sentence_transformers_path.write_text(json.dumps(current), "utf-8")
         if not lazy:
-            model = SentenceTransformer(full_name, name)
-            model.encode(["hello world"])
+            model = llm.get_embedding_model(full_name)
+            model.embed("hello world")
         for alias in aliases:
             llm.set_alias(alias, full_name)
 
