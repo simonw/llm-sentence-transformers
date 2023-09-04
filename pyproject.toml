@@ -1,7 +1,7 @@
 [project]
 name = "llm-sentence-transformers"
 version = "0.1"
-description = " Use sentence-transformers for embeddings with LLM"
+description = "Use sentence-transformers for embeddings with LLM"
 readme = "README.md"
 authors = [{name = "Simon Willison"}]
 license = {text = "Apache-2.0"}
