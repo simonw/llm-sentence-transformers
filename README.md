@@ -7,6 +7,10 @@
 
 [LLM](https://llm.datasette.io/) plugin for embedding models using [sentence-transformers](https://www.sbert.net/)
 
+Further reading:
+- [LLM now provides tools for working with embeddings](https://simonwillison.net/2023/Sep/4/llm-embeddings/)
+- [Embedding paragraphs from my blog with E5-large-v2](https://til.simonwillison.net/llms/embed-paragraphs)
+
 ## Installation
 
 Install this plugin in the same environment as LLM.
