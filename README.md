@@ -57,6 +57,8 @@ llm -m mpnet -c "Hello world"
 ```
 Embeddings are more useful if you store them in a database - see [the LLM documentation](https://llm.datasette.io/en/stable/embeddings/cli.html#storing-embeddings-in-sqlite) for instructions on doing that.
 
+Be sure to review the documentation for the model you are using. Many models will silently truncate content beyond a certain number of tokens. `all-mpnet-base-v2` says that "input text longer than 384 word pieces is truncated", for example.
+
 ## Development
 
 To set up this plugin locally, first checkout the code. Then create a new virtual environment:
