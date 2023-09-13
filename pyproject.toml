@@ -1,6 +1,6 @@
 [project]
 name = "llm-sentence-transformers"
-version = "0.1.1"
+version = "0.1.2"
 description = "Use sentence-transformers for embeddings with LLM"
 readme = "README.md"
 authors = [{name = "Simon Willison"}]
