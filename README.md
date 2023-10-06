@@ -48,12 +48,12 @@ You can run `llm aliases` to confirm which aliases you have configured, and [llm
 Once you have installed an embedding model you can use it like this:
 
 ```bash
-llm -m sentence-transformers/all-mpnet-base-v2 \
+llm embed -m sentence-transformers/all-mpnet-base-v2 \
   -c "Hello world"
 ```
 Or use its alias:
 ```bash
-llm -m mpnet -c "Hello world"
+llm embed -m mpnet -c "Hello world"
 ```
 Embeddings are more useful if you store them in a database - see [the LLM documentation](https://llm.datasette.io/en/stable/embeddings/cli.html#storing-embeddings-in-sqlite) for instructions on doing that.
 
