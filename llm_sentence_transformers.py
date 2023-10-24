@@ -3,7 +3,34 @@ from sentence_transformers import SentenceTransformer
 import textwrap
 import click
 import json
+import os
 
+if os.environ.get("LLM_TRUST_REMOTE_CODE", False):
+    from sentence_transformers.models import Transformer, Pooling
+    from transformers import AutoModel, T5Config
+    import logging
+
+    logger = logging.getLogger(__name__)
+    # Copied and modified from https://github.com/UKPLab/sentence-transformers/blob/c5f93f70eca933c78695c5bc686ceda59651ae3b/sentence_transformers/SentenceTransformer.py#L803-L810
+    def _load_auto_model(self, model_name_or_path):
+        """
+        Creates a simple Transformer + Mean Pooling model and returns the modules
+        """
+        logger.warning("No sentence-transformers model found with name {}. Creating a new one with MEAN pooling.".format(model_name_or_path))
+        transformer_model = Transformer(model_name_or_path, model_args={'trust_remote_code': True})
+        pooling_model = Pooling(transformer_model.get_word_embedding_dimension(), 'mean')
+        return [transformer_model, pooling_model]
+
+    # Copied and modified from https://github.com/UKPLab/sentence-transformers/blob/c5f93f70eca933c78695c5bc686ceda59651ae3b/sentence_transformers/models/Transformer.py#L44-L51
+    def _load_model(self, model_name_or_path, config, cache_dir):
+        """Loads the transformer model"""
+        if isinstance(config, T5Config):
+            self._load_t5_model(model_name_or_path, config, cache_dir)
+        else:
+            self.auto_model = AutoModel.from_pretrained(model_name_or_path, config=config, cache_dir=cache_dir, trust_remote_code=True)
+
+    SentenceTransformer._load_auto_model = _load_auto_model
+    Transformer._load_model = _load_model
 
 @llm.hookimpl
 def register_embedding_models(register):
