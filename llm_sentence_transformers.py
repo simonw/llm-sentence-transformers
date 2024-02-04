@@ -5,16 +5,51 @@ import click
 import json
 
 
-@llm.hookimpl
-def register_embedding_models(register):
-    sentence_transformers_path = llm.user_dir() / "sentence-transformers.json"
+def models_path():
+    return llm.user_dir() / "sentence-transformers.json"
+
+
+def read_models():
+    sentence_transformers_path = models_path()
     if not sentence_transformers_path.exists():
         llm.user_dir().mkdir(exist_ok=True, parents=True)
-        sentence_transformers_path.write_text(json.dumps(["all-MiniLM-L6-v2"]), "utf-8")
-    models = json.loads(sentence_transformers_path.read_text("utf-8"))
-    for model in models:
+        sentence_transformers_path.write_text(
+            json.dumps(
+                [
+                    {
+                        "name": "all-MiniLM-L6-v2",
+                    }
+                ],
+                indent=2,
+            ),
+            "utf-8",
+        )
+    data = json.loads(sentence_transformers_path.read_text("utf-8"))
+    fixed = []
+    for item in data:
+        if isinstance(item, str):
+            fixed.append({"name": item})
+        else:
+            fixed.append(item)
+    return fixed
+
+
+def write_models(models):
+    sentence_transformers_path = models_path()
+    with sentence_transformers_path.open("w", encoding="utf-8") as f:
+        json.dump(models, f, indent=2)
+
+
+@llm.hookimpl
+def register_embedding_models(register):
+    for model in read_models():
+        name = model["name"]
         register(
-            SentenceTransformerModel(f"sentence-transformers/{model}", model),
+            SentenceTransformerModel(
+                f"sentence-transformers/{name}",
+                name,
+                model.get("trust_remote_code", False),
+            ),
             aliases=None,
         )
 
@@ -45,20 +80,23 @@ def register_commands(cli):
     @click.option(
         "--lazy", is_flag=True, help="Don't download the model until it is first used"
     )
-    def register(name, aliases, lazy):
+    @click.option(
+        "--trust-remote-code",
+        is_flag=True,
+        help="Set trust_remote_code=True for this model",
+    )
+    def register(name, aliases, lazy, trust_remote_code):
         llm.user_dir().mkdir(exist_ok=True, parents=True)
-        sentence_transformers_path = llm.user_dir() / "sentence-transformers.json"
-        if not sentence_transformers_path.exists():
-            sentence_transformers_path.write_text("[]", "utf-8")
-        current = json.loads(sentence_transformers_path.read_text("utf-8"))
+        current = read_models()
+        current_names = [model["name"] for model in current]
         full_name = f"sentence-transformers/{name}"
-        if name in current:
+        if name in current_names:
             # Set the aliases anyway
             for alias in aliases:
                 llm.set_alias(alias, full_name)
             raise click.ClickException(f"Model {name} is already registered")
-        current.append(name)
-        sentence_transformers_path.write_text(json.dumps(current), "utf-8")
+        current.append({"name": name, "trust_remote_code": trust_remote_code})
+        write_models(current)
         if not lazy:
             model = llm.get_embedding_model(full_name)
             model.embed("hello world")
@@ -67,13 +105,16 @@ def register_commands(cli):
 
 
 class SentenceTransformerModel(llm.EmbeddingModel):
-    def __init__(self, model_id, model_name):
+    def __init__(self, model_id, model_name, trust_remote_code):
         self.model_id = model_id
         self.model_name = model_name
+        self.trust_remote_code = trust_remote_code
         self._model = None
 
     def embed_batch(self, texts):
         if self._model is None:
-            self._model = SentenceTransformer(self.model_name)
+            self._model = SentenceTransformer(
+                self.model_name, trust_remote_code=self.trust_remote_code
+            )
         results = self._model.encode(list(texts))
         return [list(map(float, result)) for result in results]

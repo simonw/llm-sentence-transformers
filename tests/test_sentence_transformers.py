@@ -39,7 +39,9 @@ def test_cli_register(user_path):
         ],
     )
     assert result.exit_code == 0, result.output
-    assert "all-MiniLM-L12-v2" in json.loads((path).read_text("utf-8"))
+    assert "all-MiniLM-L12-v2" in [
+        m["name"] for m in json.loads((path).read_text("utf-8"))
+    ]
     # And aliases should be set
     assert json.loads((user_path / "aliases.json").read_text("utf-8")) == {
         "a1": "sentence-transformers/all-MiniLM-L12-v2",
