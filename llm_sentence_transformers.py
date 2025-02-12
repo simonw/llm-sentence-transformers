@@ -115,12 +115,28 @@ class SentenceTransformerModel(llm.EmbeddingModel):
 
     def embed_batch(self, texts):
         with disable_logging():
-            if self._model is None:
-                self._model = SentenceTransformer(
-                    self.model_name, trust_remote_code=self.trust_remote_code
-                )
-            results = self._model.encode(list(texts))
-            return [list(map(float, result)) for result in results]
+            try:
+                if self._model is None:
+                    self._model = SentenceTransformer(
+                        self.model_name, trust_remote_code=self.trust_remote_code
+                    )
+                results = self._model.encode(list(texts))
+                return [list(map(float, result)) for result in results]
+            except ImportError as ex:
+                s = str(ex)
+                if "Run `pip install" in s:
+                    try:
+                        package = s.split("Run `pip install ")[1].split("`")[0]
+                        raise ImportError(
+                            "Install the missing package with `llm install "
+                            + package
+                            + "`"
+                        )
+                    except IndexError:
+                        # Raise the original
+                        raise ex
+                else:
+                    raise
 
 
 @contextlib.contextmanager
