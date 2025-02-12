@@ -1,4 +1,6 @@
+import contextlib
 import llm
+import logging
 from sentence_transformers import SentenceTransformer
 import textwrap
 import click
@@ -112,9 +114,27 @@ class SentenceTransformerModel(llm.EmbeddingModel):
         self._model = None
 
     def embed_batch(self, texts):
-        if self._model is None:
-            self._model = SentenceTransformer(
-                self.model_name, trust_remote_code=self.trust_remote_code
-            )
-        results = self._model.encode(list(texts))
-        return [list(map(float, result)) for result in results]
+        with disable_logging():
+            if self._model is None:
+                self._model = SentenceTransformer(
+                    self.model_name, trust_remote_code=self.trust_remote_code
+                )
+            results = self._model.encode(list(texts))
+            return [list(map(float, result)) for result in results]
+
+
+@contextlib.contextmanager
+def disable_logging(level=logging.WARNING):
+    # Save the current disable level and the current root logger level.
+    prev_disable = logging.root.manager.disable
+    root_logger = logging.getLogger()
+    prev_level = root_logger.level
+
+    # Disable logging up to the specified level.
+    logging.disable(level)
+    try:
+        yield
+    finally:
+        # Restore the previous disable level and logger level.
+        logging.disable(prev_disable)
+        root_logger.setLevel(prev_level)
