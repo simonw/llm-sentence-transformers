@@ -39,6 +39,8 @@ llm sentence-transformers register \
   all-mpnet-base-v2 \
   --alias mpnet
 ```
+Some models may also require you to pass the `--trust-remote-code` flag when registering them. The model documentation will usually mention that in the Python example code on Hugging Face.
+
 The `--alias` is optional, but can be used to configure one or more shorter aliases for the model.
 
 You can run `llm aliases` to confirm which aliases you have configured, and [llm aliases set](https://llm.datasette.io/en/stable/aliases.html) to configure further aliases.
@@ -59,6 +61,23 @@ Embeddings are more useful if you store them in a database - see [the LLM docume
 
 Be sure to review the documentation for the model you are using. Many models will silently truncate content beyond a certain number of tokens. `all-mpnet-base-v2` says that "input text longer than 384 word pieces is truncated", for example.
 
+## Removing models
+
+Models are stored in the Hugging Face cache directory, which can usually be found in `~/.cache/huggingface/hub`.
+
+To remove a model, first delete the directory for that model from the cache directory, then manually remove the model from the `sentence-transformers.json` file in the LLM configuration directory. The location of this directory can be found by running `llm logs path`:
+
+```bash
+llm logs path
+```
+Example output:
+```
+/Users/simon/Library/Application Support/io.datasette.llm/logs.db
+```
+In this case, `sentence-transformers.json` would be located at:
+```
+/Users/simon/Library/Application Support/io.datasette.llm/sentence-transformers.json
+```
 ## Development
 
 To set up this plugin locally, first checkout the code. Then create a new virtual environment:
