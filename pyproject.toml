@@ -10,7 +10,8 @@ classifiers = [
 ]
 dependencies = [
     "llm>=0.9",
-    "sentence-transformers"
+    "sentence-transformers",
+    "einops"
 ]
 
 [project.urls]
