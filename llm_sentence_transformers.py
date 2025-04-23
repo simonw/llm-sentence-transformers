@@ -1,7 +1,6 @@
 import contextlib
 import llm
 import logging
-from sentence_transformers import SentenceTransformer
 import textwrap
 import click
 import json
@@ -114,6 +113,10 @@ class SentenceTransformerModel(llm.EmbeddingModel):
         self._model = None
 
     def embed_batch(self, texts):
+        # Importing this at the root of the module slowed down every
+        # LLM command, even llm --help
+        from sentence_transformers import SentenceTransformer
+
         with disable_logging():
             try:
                 if self._model is None:
